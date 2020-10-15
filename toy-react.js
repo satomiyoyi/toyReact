@@ -4,7 +4,7 @@ class ElementWraper {
         this.root = document.createElement(tagName);
     }
     setAttribute(name, value) {
-         // 如果属性为onClick 单独识别
+        // 如果属性为onClick 单独识别
         // 绑定事件，建立监听方法
         if (name.match(/^on([\s\S]+)$/)) {
             this.root.addEventListener(RegExp.$1.toLowerCase(), value);
@@ -93,13 +93,14 @@ export class Component {
             this.rerender();
             return;
         }
-        let merge = function (oldState, newState) {
-            for (let item in oldState) {
-                if (oldState[item] === null || typeof oldState[item] !== 'object') {
-                    oldState[item] = newState[item];
+        let merge = (oldState, newState) => {
+            for (let p in newState) {
+                if (oldState !== null || typeof oldState[p] !== 'object') {
+                    oldState[p] = newState[p];
+
                 }
                 else {
-                    merge(oldState[item], newState[item]);
+                    merge(oldState[p], newState[p]);
                 }
             }
         };
