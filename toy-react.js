@@ -10,6 +10,9 @@ class ElementWraper {
             this.root.addEventListener(RegExp.$1.toLowerCase(), value);
         }
         else {
+            if (name === 'className') {
+                name = 'class';
+            }
             this.root.setAttribute(name, value);
         }
     }
@@ -69,8 +72,20 @@ export class Component {
     //     return this._root;
     // }
     rerender() {
-        this._range.deleteContents();
-        this[RENDER_TO_DOM](this._range);
+        // range会相邻合并，会造成从左向右点击棋子的时候部分棋盘丢失。
+        // 创建插入range
+        let range = document.createRange();
+        // 保存老的range
+        let oldRange = this._range;
+        // 在老range之前
+        range.setStart(oldRange.startContainer, this._range.startOffset);
+        range.setEnd(oldRange.startContainer, this._range.startOffset);
+        this[RENDER_TO_DOM](range);
+        // 因为插入了没有内容的新range，因此也会扩充到老的range里面
+        // 所以要重新定义老range的开始位置
+        oldRange.setStart(range.endContainer, range.endOffset);
+        // 删除老range内容
+        oldRange.deleteContents();
     }
     setState(newState) {
         if (this.state === null || typeof this.state !== 'object') {
@@ -80,8 +95,8 @@ export class Component {
         }
         let merge = function (oldState, newState) {
             for (let item in oldState) {
-                if (oldState === null || typeof oldState !== 'object') {
-                    newState[item] = oldState[item];
+                if (oldState[item] === null || typeof oldState[item] !== 'object') {
+                    oldState[item] = newState[item];
                 }
                 else {
                     merge(oldState[item], newState[item]);
@@ -109,6 +124,9 @@ export function createElement(tag, attributes, ...children) {
             // 文本节点创建文本节点即可
             if (typeof child === 'string') {
                 child = new TextWraper(child);
+            }
+            if (child === null) {
+                continue;
             }
             // Component 实例children属性可能为数组 那么递归调用插入元素
             if (typeof child === 'object' && child instanceof Array) {

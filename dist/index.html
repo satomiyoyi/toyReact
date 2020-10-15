@@ -1,11 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body {
+            font: 14px "Century Gothic", Futura, sans-serif;
+            margin: 20px;
+        }
+
+        ol,
+        ul {
+            padding-left: 30px;
+        }
+
+        .board-row:after {
+            clear: both;
+            content: "";
+            display: table;
+        }
+
+        .status {
+            margin-bottom: 10px;
+        }
+
+        .square {
+            background: #fff;
+            border: 1px solid #999;
+            float: left;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 34px;
+            height: 34px;
+            margin-right: -1px;
+            margin-top: -1px;
+            padding: 0;
+            text-align: center;
+            width: 34px;
+        }
+
+        .square:focus {
+            outline: none;
+        }
+
+        .kbd-navigation .square:focus {
+            background: #ddd;
+        }
+
+        .game {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .game-info {
+            margin-left: 20px;
+        }
+    </style>
 </head>
+
 <body>
+    <div id="root"></div>
     <script src="./main.js"></script>
+    <!-- <p id="p1">
+        <b>hello</b> world!
+    </p>
+    <script>
+        let p1 = document.createRange();
+        let p2 = document.createRange();
+        let helloNode = document.getElementById('p1').childNodes[1].firstChild;
+        let wordNode = document.getElementById('p1').lastChild;
+
+        p1.setStart(helloNode, 2);
+        p1.setEnd(wordNode, 3);
+        console.log(p1);
+        // p2.selectNodeContents(document.getElementById('p1'));
+        p2.setStart(document.getElementById('p1'), 2);
+        p2.setEnd(document.getElementById('p1'), 3);
+
+        let node1 = document.createElement('div');
+        node1.innerText = 'new div node';
+        p2.insertNode(node1);
+    </script>
+    -->
 </body>
+
 </html>
