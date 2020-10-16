@@ -2,7 +2,7 @@ import {
     createElement,
     Component,
     render
-} from './toy-react';
+} from './toy-react-1';
 // 第一版code地址https://codepen.io/gaearon/pen/VbbVLg
 // 最终版code地址
 class Square extends Component {

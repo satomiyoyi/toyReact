@@ -1,5 +1,43 @@
 const RENDER_TO_DOM = Symbol('renderToDom');
+class ElementWraper {
+    constructor(tagName) {
+        this.root = document.createElement(tagName);
+    }
+    setAttribute(name, value) {
+        // 如果属性为onClick 单独识别
+        // 绑定事件，建立监听方法
+        if (name.match(/^on([\s\S]+)$/)) {
+            this.root.addEventListener(RegExp.$1.toLowerCase(), value);
+        }
+        else {
+            if (name === 'className') {
+                name = 'class';
+            }
+            this.root.setAttribute(name, value);
+        }
+    }
+    appendChild(elem) {
+        let range = document.createRange();
+        range.setStart(this.root, this.root.childNodes.length);
+        range.setEnd(this.root, this.root.childNodes.length);
+        elem[RENDER_TO_DOM](range);
+    }
+    [RENDER_TO_DOM](range) {
+        range.deleteContents();
+        range.insertNode(this.root);
+    }
 
+}
+class TextWraper {
+    constructor(content) {
+        this.root = document.createTextNode(content);
+    }
+    [RENDER_TO_DOM](range) {
+        range.deleteContents();
+        range.insertNode(this.root);
+    }
+}
+// 组件基类
 export class Component {
     constructor() {
         // 定义私有属性_root
@@ -19,9 +57,8 @@ export class Component {
     // 私有方法
     [RENDER_TO_DOM](range) {
         this._range = range;
-        // range.deleteContents();
-        // range.insertNode(this.render().root);
-        this.render()[RENDER_TO_DOM](range);
+        range.deleteContents();
+        range.insertNode(this.render().root);
     }
     // // root属性获取方法
     // get root() {
@@ -70,94 +107,7 @@ export class Component {
         merge(this.state, newState);
         this.rerender();
     }
-    get vdom() {
-        return this.render().vdom;
-    }
-    get vchild() {
-        return this.children.map(child => child.vdom);
-    }
 }
-class ElementWraper extends Component {
-    constructor(tagName) {
-        super(tagName);
-        // this.root = document.createElement(tagName);
-        this.type = tagName;
-    }
-    // setAttribute(name, value) {
-    //     // 如果属性为onClick 单独识别
-    //     // 绑定事件，建立监听方法
-    //     if (name.match(/^on([\s\S]+)$/)) {
-    //         this.root.addEventListener(RegExp.$1.toLowerCase(), value);
-    //     }
-    //     else {
-    //         if (name === 'className') {
-    //             name = 'class';
-    //         }
-    //         this.root.setAttribute(name, value);
-    //     }
-    // }
-    // appendChild(elem) {
-    //     let range = document.createRange();
-    //     range.setStart(this.root, this.root.childNodes.length);
-    //     range.setEnd(this.root, this.root.childNodes.length);
-    //     elem[RENDER_TO_DOM](range);
-    // }
-    [RENDER_TO_DOM](range) {
-        range.deleteContents();
-        let root = document.createElement(this.type);
-        for (let name in this.props) {
-            let value = this.props[name];
-            if (name.match(/^on([\s\S]+)$/)) {
-                root.addEventListener(RegExp.$1.toLowerCase(), value);
-            }
-            else {
-                if (name === 'className') {
-                    name = 'class';
-                }
-                root.setAttribute(name, value);
-            }
-        }
-        for (let child of this.children) {
-            let childRange = document.createRange();
-            childRange.setStart(root, root.childNodes.length);
-            childRange.setEnd(root, root.childNodes.length);
-            child[RENDER_TO_DOM](childRange);
-        }
-
-        
-        range.insertNode(root);
-    }
-    get vdom() {
-        // return {
-        //     type: this.type,
-        //     props: this.props,
-        //     children: this.children.map(child => child.vdom)
-        // };
-        return this;
-    }
-
-}
-class TextWraper extends Component {
-    constructor(content) {
-        super(content);
-        // this.root = document.createTextNode(content);
-        this.content = content;
-        this.type = '#text';
-    }
-    [RENDER_TO_DOM](range) {
-        let root = document.createTextNode(this.content);
-        range.deleteContents();
-        range.insertNode(root);
-    }
-    get vdom() {
-        // return {
-        //     type: '#text',
-        //     content: this.content
-        // };
-        return this;
-    }
-}
-// 组件基类
 export function createElement(tag, attributes, ...children) {
     let dom = null;
     if (typeof tag === 'string') {

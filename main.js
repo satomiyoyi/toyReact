@@ -2,7 +2,7 @@ import {
     createElement,
     Component,
     render
-} from './toy-react';
+} from './toy-react-1';
 
 class MyComponent extends Component {
     constructor() {
